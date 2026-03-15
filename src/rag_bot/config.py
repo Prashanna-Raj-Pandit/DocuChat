@@ -14,6 +14,10 @@ class Config:
     pdf_dir: Path = Path(os.getenv("PDF_DIR", "data/raw/pdfs"))
     output_dir: Path = Path(os.getenv("OUTPUT_PHASE1", "data/phase1_ingestion"))
 
+    # llm
+    cohere_api_key: str = str(os.getenv("COHERE_API_KEY"))
+    cohere_model: str = os.getenv("COHERE_MODEL")
+
     chunk_size: int = int(os.getenv("CHUNK_SIZE", "1200"))
     chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "200"))
     phase1_document_path: Path = ROOT / "data/processed/phase1_ingestion.jsonl"

@@ -63,8 +63,8 @@ class KnowledgeRetriever:
         ranked = sorted(best_hits.values(), key=lambda item: item[0])
         return [evidence for _, evidence in ranked[:final_top_k]]
 
-
-if __name__ == "__main__":
-    kr = KnowledgeRetriever()
-    results = kr.query_builder(question=["do i have machine learning experience?", "do i have any certifications?"])
-    print(results)
+# Testing knowledge retrival by querying vector database
+# if __name__ == "__main__":
+#     kr = KnowledgeRetriever()
+#     results = kr.query_builder(question=["do i have machine learning experience?", "do i have any certifications?"])
+#     print(results)

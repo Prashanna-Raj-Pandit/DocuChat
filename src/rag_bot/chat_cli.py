@@ -4,6 +4,7 @@ from typing import List
 from src.rag_bot.config import config
 from src.rag_bot.retrieval.knowledge_retriever import KnowledgeRetriever
 from src.rag_bot.model import RetrieveEvidence
+from src.rag_bot.llm.rag_generator import RAGGenerator
 
 
 @dataclass
@@ -29,6 +30,7 @@ class RetrievalChatCLI:
     def __init__(self) -> None:
         self.retriever = KnowledgeRetriever()
         self.state = ChatState()
+        self.rag_generator = RAGGenerator()
 
     def _dynamix_top_k_per_query(self) -> int:
         """
@@ -55,7 +57,7 @@ class RetrievalChatCLI:
 
     def _print_queries_used(self, queries: list[str], top_k_per_query: int, final_top_k: int) -> None:
         print("[INFO] Queries used for retrival")
-        for i, query in enumerate(queries,start=1):
+        for i, query in enumerate(queries, start=1):
             print(f"{i}.{query}")
 
         print("[INFO] Top k per query: ", top_k_per_query)
@@ -116,7 +118,12 @@ class RetrievalChatCLI:
             evidence_items = self.retriever.query_builder(question=queries,
                                                           top_k_per_query=top_k_per_query,
                                                           final_top_k=final_top_k)
-            self._print_results(evidence_items)
+            # self._print_results(evidence_items)
+            answer = self.rag_generator.answer(current_question=user_input,
+                                               chat_history=queries,
+                                               evidence_items=evidence_items)
+            print("\nAssistant:")
+            print(answer)
 
 
 if __name__ == "__main__":

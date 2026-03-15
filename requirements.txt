@@ -13,3 +13,4 @@ typing_extensions==4.15.0
 chromadb==0.5.5
 sentence-transformers==3.0.1
 langchain-text-splitters==0.2.2
+cohere==5.13.11
