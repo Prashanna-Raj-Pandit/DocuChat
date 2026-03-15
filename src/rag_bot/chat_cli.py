@@ -5,6 +5,7 @@ from src.rag_bot.config import config
 from src.rag_bot.retrieval.knowledge_retriever import KnowledgeRetriever
 from src.rag_bot.model import RetrieveEvidence
 
+
 @dataclass
 class ChatState:
     """
@@ -54,25 +55,25 @@ class RetrievalChatCLI:
 
     def _print_queries_used(self, queries: list[str], top_k_per_query: int, final_top_k: int) -> None:
         print("[INFO] Queries used for retrival")
-        for i,query in enumerate(queries):
+        for i, query in enumerate(queries):
             print(f"{i}.{query}")
 
-        print("[INFO] Top k per query: ",top_k_per_query)
-        print("[INFO] Print final top k: ",final_top_k)
+        print("[INFO] Top k per query: ", top_k_per_query)
+        print("[INFO] Print final top k: ", final_top_k)
 
-    def _print_results(self,evidence_items:list[RetrieveEvidence])->None:
+    def _print_results(self, evidence_items: list[RetrieveEvidence]) -> None:
         if not evidence_items:
             print("\n[INFO] Evidence not found.")
         print(f"\n[INFO] Retrieved {len(evidence_items)} evidence chunks")
 
-        for idx,item in enumerate(evidence_items,start=1):
-            metadata=item.metadata or {}
-            source_type=metadata.get("source_type","")
-            source_name=metadata.get("source_name","")
-            document_title=metadata.get("document_title","")
-            page_number=metadata.get("page_number","")
-            file_path=metadata.get("path","")
-            distance=item.distance
+        for idx, item in enumerate(evidence_items, start=1):
+            metadata = item.metadata or {}
+            source_type = metadata.get("source_type", "")
+            source_name = metadata.get("source_name", "")
+            document_title = metadata.get("document_title", "")
+            page_number = metadata.get("page_number", "")
+            file_path = metadata.get("path", "")
+            distance = item.distance
 
             print(f"Result #{idx}")
             print(f"Chunk ID: {item.chunk_id}")
@@ -89,7 +90,7 @@ class RetrievalChatCLI:
                 print(f"Page Number: {page_number}")
             if file_path:
                 print(f"File path: {file_path}")
-            preview=item.text[:700].strip()
+            preview = item.text[:700].strip()
             print("Text Preview:")
             print(preview)
             print()
@@ -112,9 +113,9 @@ class RetrievalChatCLI:
                                      top_k_per_query=top_k_per_query,
                                      final_top_k=final_top_k)
 
-            evidence_items=self.retriever.query_builder(question=queries,
-                                                        top_k_per_query=top_k_per_query,
-                                                        final_top_k=final_top_k)
+            evidence_items = self.retriever.query_builder(question=queries,
+                                                          top_k_per_query=top_k_per_query,
+                                                          final_top_k=final_top_k)
             self._print_results(evidence_items)
 
 

@@ -45,7 +45,7 @@ class KnowledgeRetriever:
                 text = docs[idx] if idx < len(docs) else ""
                 metadata = metadatas[idx] if idx < len(metadatas) else {}
                 distance = distances[idx] if idx < len(distances) else 9999.0
-                evidence=RetrieveEvidence(
+                evidence = RetrieveEvidence(
                     chunk_id=chunk_id,
                     distance=float(distance),
                     text=text,
@@ -55,13 +55,13 @@ class KnowledgeRetriever:
                 evidence_items.append(evidence)
 
                 # Lower score is better
-                adjusted_score=float(distance)+recency_penalty
-                existing=best_hits.get(chunk_id)
-                if existing is None or adjusted_score<existing[0]:
-                    best_hits[chunk_id]=(adjusted_score,evidence)
+                adjusted_score = float(distance) + recency_penalty
+                existing = best_hits.get(chunk_id)
+                if existing is None or adjusted_score < existing[0]:
+                    best_hits[chunk_id] = (adjusted_score, evidence)
         # sort globally by best adjusted score
-        ranked=sorted(best_hits.values(),key=lambda item:item[0])
-        return [evidence for _,evidence in ranked[:final_top_k]]
+        ranked = sorted(best_hits.values(), key=lambda item: item[0])
+        return [evidence for _, evidence in ranked[:final_top_k]]
 
 
 if __name__ == "__main__":
