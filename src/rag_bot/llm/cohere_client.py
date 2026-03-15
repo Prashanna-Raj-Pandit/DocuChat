@@ -23,7 +23,6 @@ class CohereClient:
             temperature=temperature
         )
         text = self._extract_text(response)
-        print(text)
         return text.strip()
 
     @staticmethod
