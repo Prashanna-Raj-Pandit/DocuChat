@@ -55,7 +55,7 @@ class RetrievalChatCLI:
 
     def _print_queries_used(self, queries: list[str], top_k_per_query: int, final_top_k: int) -> None:
         print("[INFO] Queries used for retrival")
-        for i, query in enumerate(queries):
+        for i, query in enumerate(queries,start=1):
             print(f"{i}.{query}")
 
         print("[INFO] Top k per query: ", top_k_per_query)

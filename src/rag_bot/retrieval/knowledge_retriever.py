@@ -25,7 +25,7 @@ class KnowledgeRetriever:
         final_top_k = final_top_k or config.top_k_results
         # keep the best version of each chunk by chunk id
         # score= lower is better
-        best_hits: dict[str, tuple[float, RetrieveEvidence]] = {}
+        best_hits: dict[str, tuple[float, RetrieveEvidence]] = {}  # chunk_id : (score, evidence_object)
 
         seen_chunk_ids: set[str] = set()
         evidence_items: list[RetrieveEvidence] = []
@@ -56,7 +56,7 @@ class KnowledgeRetriever:
 
                 # Lower score is better
                 adjusted_score = float(distance) + recency_penalty
-                existing = best_hits.get(chunk_id)
+                existing = best_hits.get(chunk_id)  # existing = (1.62, RetrieveEvidence(...))
                 if existing is None or adjusted_score < existing[0]:
                     best_hits[chunk_id] = (adjusted_score, evidence)
         # sort globally by best adjusted score
@@ -66,5 +66,5 @@ class KnowledgeRetriever:
 
 if __name__ == "__main__":
     kr = KnowledgeRetriever()
-    results = kr.query_builder(question=["do i have machine learning experience?"])
+    results = kr.query_builder(question=["do i have machine learning experience?", "do i have any certifications?"])
     print(results)
