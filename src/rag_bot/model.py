@@ -18,6 +18,7 @@ class ChunkRecord(BaseModel):
 
 class RetrieveEvidence(BaseModel):
     chunk_id: str
+    distance: float
     text: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     query_used: str = ""

@@ -1,2 +1,20 @@
 .idea
 .DS_Store
+rag.txt
+src/Notes
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+
+# Environment Variables
+src/rag_bot/.env
+.env
+.env.production
+.env.*
+
+data
