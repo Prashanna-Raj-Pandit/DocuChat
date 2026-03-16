@@ -97,7 +97,7 @@ class RetrievalChatCLI:
             print(preview)
             print()
 
-    def run(self) -> None:
+    def run_cli(self) -> None:
         self._print_banner()
         while True:
             user_input = input("\nYou: ").strip()
@@ -125,7 +125,26 @@ class RetrievalChatCLI:
             print("\nAssistant:")
             print(answer)
 
+    def communicate_api(self, message: str) -> (str, int):
+        user_input = message.strip()
+        self.state.add_query(user_input)
+        queries = self.state.get_queries_for_retrieval()
+        top_k_per_query = self._dynamix_top_k_per_query()
+        final_top_k = self._dynamic_final_top_k()
+        self._print_queries_used(queries=queries,
+                                 top_k_per_query=top_k_per_query,
+                                 final_top_k=final_top_k)
+
+        evidence_items = self.retriever.query_builder(question=queries,
+                                                      top_k_per_query=top_k_per_query,
+                                                      final_top_k=final_top_k)
+        answer = self.rag_generator.answer(current_question=user_input,
+                                           chat_history=queries,
+                                           evidence_items=evidence_items)
+
+        return answer, top_k_per_query
+
 
 if __name__ == "__main__":
     cli = RetrievalChatCLI()
-    cli.run()
+    cli.run_cli()
