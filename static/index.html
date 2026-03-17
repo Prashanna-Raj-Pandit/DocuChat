@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DocuChat — Retrieval Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;1,200&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/synapse.css"/>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- Processing bar -->
+<div id="proc-bar"></div>
+
+<!-- Scanlines -->
+<div id="scanlines"></div>
+
+<!-- BG canvas (neural network) -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Data streams left -->
+<div id="streams">
+  <div class="stream-col" id="sc1"></div>
+  <div class="stream-col" id="sc2"></div>
+  <div class="stream-col" id="sc3"></div>
+</div>
+
+<!-- Data streams right -->
+<div id="streams-r">
+  <div class="stream-col" id="sc4"></div>
+  <div class="stream-col" id="sc5"></div>
+  <div class="stream-col" id="sc6"></div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="brand">
+    <div id="brand-name">DocuChat</div>
+    <div id="brand-sub">retrieval-augmented intelligence · v0.1.0</div>
+  </div>
+  <div id="status-cluster">
+    <div class="s-row"><span class="s-label" id="s-main">NEURAL NET ONLINE</span><div class="s-dot active" id="sd-main"></div></div>
+    <div class="s-row"><span class="s-label" id="s-vec">VECTOR DB INDEXED</span><div class="s-dot" id="sd-vec"></div></div>
+    <div class="s-row"><span class="s-label" id="s-llm">LLM STANDBY</span><div class="s-dot" id="sd-llm"></div></div>
+  </div>
+  <div id="ruler"></div>
+</div>
+
+<!-- Corner brackets -->
+<div class="bracket" id="b-tl"><svg viewBox="0 0 56 56" fill="none">
+  <path d="M3 53V14A11 11 0 0 1 14 3h39" stroke="rgba(0,255,224,.35)" stroke-width="1"/>
+  <circle cx="3" cy="53" r="2" fill="rgba(0,255,224,.5)"/>
+  <circle cx="3" cy="3" r="1.5" fill="rgba(0,255,224,.2)"/>
+</svg></div>
+<div class="bracket" id="b-tr"><svg viewBox="0 0 56 56" fill="none">
+  <path d="M3 53V14A11 11 0 0 1 14 3h39" stroke="rgba(0,255,224,.35)" stroke-width="1"/>
+  <circle cx="3" cy="53" r="2" fill="rgba(0,255,224,.5)"/>
+</svg></div>
+<div class="bracket" id="b-bl"><svg viewBox="0 0 56 56" fill="none">
+  <path d="M3 53V14A11 11 0 0 1 14 3h39" stroke="rgba(0,255,224,.35)" stroke-width="1"/>
+  <circle cx="3" cy="53" r="2" fill="rgba(0,255,224,.5)"/>
+</svg></div>
+<div class="bracket" id="b-br"><svg viewBox="0 0 56 56" fill="none">
+  <path d="M3 53V14A11 11 0 0 1 14 3h39" stroke="rgba(0,255,224,.35)" stroke-width="1"/>
+  <circle cx="3" cy="53" r="2" fill="rgba(0,255,224,.5)"/>
+</svg></div>
+
+<!-- Live metrics -->
+<div id="metrics">
+  <div class="metric">
+    <span class="metric-label">LATENCY</span>
+    <div class="metric-bar-wrap"><div class="metric-bar" id="mb-lat" style="width:22%"></div></div>
+    <span class="metric-val" id="mv-lat">22ms</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">RECALL</span>
+    <div class="metric-bar-wrap"><div class="metric-bar" id="mb-rec" style="width:87%;background:var(--c2)"></div></div>
+    <span class="metric-val" id="mv-rec" style="color:var(--c2)">87%</span>
+  </div>
+  <div class="metric">
+    <span class="metric-label">CHUNKS</span>
+    <div class="metric-bar-wrap"><div class="metric-bar" id="mb-chk" style="width:60%;background:var(--c3)"></div></div>
+    <span class="metric-val" id="mv-chk" style="color:var(--c3)">5</span>
+  </div>
+</div>
+
+<!-- Center stage -->
+<div id="stage">
+  <div id="orb-wrap">
+
+    <!-- Rotating rings -->
+    <div class="ring" id="ring1">
+      <!-- Tick marks -->
+      <div class="tick" style="transform:rotate(0deg) translateY(-135px)"></div>
+      <div class="tick" style="transform:rotate(45deg) translateY(-135px);opacity:.4"></div>
+      <div class="tick" style="transform:rotate(90deg) translateY(-135px)"></div>
+      <div class="tick" style="transform:rotate(135deg) translateY(-135px);opacity:.4"></div>
+      <div class="tick" style="transform:rotate(180deg) translateY(-135px)"></div>
+      <div class="tick" style="transform:rotate(225deg) translateY(-135px);opacity:.4"></div>
+      <div class="tick" style="transform:rotate(270deg) translateY(-135px)"></div>
+      <div class="tick" style="transform:rotate(315deg) translateY(-135px);opacity:.4"></div>
+    </div>
+    <div class="ring" id="ring2"></div>
+    <div class="ring" id="ring3"></div>
+
+    <!-- Main orb -->
+    <div id="orb" onclick="toggleVoice()">
+      <svg id="mic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </div>
+
+    <!-- Orb data readouts -->
+    <div class="orb-readout" id="r-top">FREQ: <span id="freq-val">440Hz</span></div>
+    <div class="orb-readout" id="r-right">CONF<br><span id="conf-val">—</span></div>
+    <div class="orb-readout" id="r-bottom">MODE: VOICE</div>
+    <div class="orb-readout" id="r-left">VEC<br><span id="vec-val">—</span></div>
+
+  </div>
+
+  <!-- Voice transcript area -->
+  <div id="voice-area">
+    <div id="voice-q"></div>
+    <div id="voice-a"></div>
+    <div id="voice-hint">CLICK ORB TO SPEAK — PRESS &amp; HOLD — OR TYPE</div>
+  </div>
+</div>
+
+<!-- Mode bar -->
+<div id="mode-bar">
+  <button class="mb-btn on" id="btn-v" onclick="setMode('voice')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="23"/>
+      <line x1="8" y1="23" x2="16" y2="23"/>
+    </svg>
+    VOICE
+  </button>
+  <button class="mb-btn" id="btn-t" onclick="setMode('text')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    CHAT
+  </button>
+</div>
+
+<!-- Side panel -->
+<div id="panel">
+  <div id="ph">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div id="ph-title">NEURAL CHAT</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="ev-count">0 CHUNKS</span>
+      <button id="ph-close" onclick="setMode('voice')">✕</button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div id="msgs">
+    <div class="msg a">
+      <div class="msg-who">DocuChat</div>
+      <div class="msg-b">Neural retrieval system initialized. How can I help you today?</div>
+    </div>
+  </div>
+
+  <!-- Evidence section -->
+  <div id="ev-section"></div>
+
+  <!-- Input area -->
+  <div id="input-area">
+    <div id="iw">
+      <textarea id="inp" rows="1" placeholder="Query the knowledge base…"></textarea>
+      <button id="send" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div id="input-footer">
+      <span class="ifooter-text">ENTER TO SEND · SHIFT+ENTER FOR NEWLINE</span>
+      <span class="ifooter-text" id="char-count">0</span>
+    </div>
+  </div>
+</div>
+
+<script src="/static/synapse.js"></script>
+</body>
+</html>
