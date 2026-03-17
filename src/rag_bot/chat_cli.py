@@ -142,7 +142,7 @@ class RetrievalChatCLI:
                                            chat_history=queries,
                                            evidence_items=evidence_items)
 
-        return answer, top_k_per_query
+        return answer, evidence_items
 
 
 if __name__ == "__main__":
