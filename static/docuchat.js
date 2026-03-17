@@ -1,7 +1,4 @@
-
-// ══════════════════════════════════════════════════════════════════
 // CURSOR
-// ══════════════════════════════════════════════════════════════════
 const $cur  = document.getElementById('cur');
 const $ring = document.getElementById('cur-ring');
 let cx = 0, cy = 0, rx2 = 0, ry2 = 0;
@@ -18,9 +15,7 @@ document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; })
   requestAnimationFrame(moveCursor);
 })();
 
-// ══════════════════════════════════════════════════════════════════
 // BG NEURAL NETWORK
-// ══════════════════════════════════════════════════════════════════
 const bgC = document.getElementById('bg-canvas');
 const bgX = bgC.getContext('2d');
 let W, H, nodes = [], speed = 1;
@@ -48,9 +43,9 @@ class NNode {
     this.x     += this.vx * spd;
     this.y     += this.vy * spd;
     this.pulse += .025 * spd;
-    if (this.x < -10)   this.x = W + 10;
+    if (this.x < -10)    this.x = W + 10;
     if (this.x > W + 10) this.x = -10;
-    if (this.y < -10)   this.y = H + 10;
+    if (this.y < -10)    this.y = H + 10;
     if (this.y > H + 10) this.y = -10;
   }
 
@@ -108,9 +103,7 @@ window.addEventListener('resize', initBg);
 initBg();
 bgLoop();
 
-// ══════════════════════════════════════════════════════════════════
 // PARTICLE SYSTEM
-// ══════════════════════════════════════════════════════════════════
 const pC = document.getElementById('particle-canvas');
 const pX = pC.getContext('2d');
 let particles = [];
@@ -161,9 +154,7 @@ document.addEventListener('mousemove', e => {
   if (Math.random() > .85) spawnParticles(e.clientX, e.clientY, 1, [0, 255, 224]);
 });
 
-// ══════════════════════════════════════════════════════════════════
 // DATA STREAMS
-// ══════════════════════════════════════════════════════════════════
 const CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ∂∇⊗⊕∞';
 
 function fillStream(id) {
@@ -179,9 +170,7 @@ function fillStream(id) {
   setInterval(() => fillStream(id), 800 + Math.random() * 1200);
 });
 
-// ══════════════════════════════════════════════════════════════════
 // ANIMATED READOUTS
-// ══════════════════════════════════════════════════════════════════
 const freqEl = document.getElementById('freq-val');
 const confEl = document.getElementById('conf-val');
 const vecEl  = document.getElementById('vec-val');
@@ -191,17 +180,15 @@ setInterval(() => {
   vecEl.textContent  = (Math.floor(Math.random() * 9000) + 1000);
 }, 600);
 
-// ══════════════════════════════════════════════════════════════════
 // LIVE METRICS
-// ══════════════════════════════════════════════════════════════════
 function animMetrics(lat, rec, chk) {
   const latPct = Math.min(lat / 200 * 100, 100);
-  document.getElementById('mb-lat').style.width  = latPct + '%';
-  document.getElementById('mv-lat').textContent  = lat + 'ms';
-  document.getElementById('mb-rec').style.width  = rec + '%';
-  document.getElementById('mv-rec').textContent  = rec + '%';
-  document.getElementById('mb-chk').style.width  = (chk / 15 * 100) + '%';
-  document.getElementById('mv-chk').textContent  = chk;
+  document.getElementById('mb-lat').style.width   = latPct + '%';
+  document.getElementById('mv-lat').textContent   = lat + 'ms';
+  document.getElementById('mb-rec').style.width   = rec + '%';
+  document.getElementById('mv-rec').textContent   = rec + '%';
+  document.getElementById('mb-chk').style.width   = (chk / 15 * 100) + '%';
+  document.getElementById('mv-chk').textContent   = chk;
   document.getElementById('ev-count').textContent = chk + ' CHUNKS';
 }
 
@@ -212,9 +199,7 @@ setInterval(() => {
   }
 }, 1500);
 
-// ══════════════════════════════════════════════════════════════════
 // MODE SWITCHING
-// ══════════════════════════════════════════════════════════════════
 let mode = 'voice';
 
 function setMode(m) {
@@ -265,14 +250,15 @@ inpEl.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
 });
 
+// role: 'u' = user (purple bubble, right), 'a' = assistant (cyan bubble, left)
 function addMsg(role, html) {
   const d = document.createElement('div');
-  d.className = 'msg ' + (role === 'user' ? 'u' : 'a');
-  d.innerHTML = `<div class="msg-who">${role === 'user' ? 'YOU' : 'DocuChat'}</div><div class="msg-b">${html}</div>`;
+  d.className = 'msg ' + (role === 'u' ? 'u' : 'a');
+  d.innerHTML = `<div class="msg-who">${role === 'u' ? 'YOU' : 'DocuChat'}</div><div class="msg-b">${html}</div>`;
   msgsEl.appendChild(d);
   msgsEl.scrollTop = msgsEl.scrollHeight;
   const rect = d.getBoundingClientRect();
-  spawnParticles(rect.left + 20, rect.top, 12, role === 'user' ? [168,85,247] : [0,255,224]);
+  spawnParticles(rect.left + 20, rect.top, 12, role === 'u' ? [168,85,247] : [0,255,224]);
   return d;
 }
 
@@ -329,7 +315,8 @@ async function sendMsg() {
   inpEl.value        = '';
   inpEl.style.height = 'auto';
   document.getElementById('char-count').textContent = '0';
-  addMsg('user', txt);
+
+  addMsg('u', txt);        // FIX: 'u' not 'user'
   addTyping();
   setProc(true);
 
@@ -342,7 +329,7 @@ async function sendMsg() {
     });
     const data = await res.json();
     rmTyping();
-    addMsg('assistant', data.answer || 'No response from knowledge base.');
+    addMsg('a', data.answer || 'No response from knowledge base.');  // FIX: 'a' not 'assistant'
     const lat = Date.now() - t0;
     const chk = data.evidence_count || 5;
     animMetrics(lat, Math.round(80 + Math.random() * 15), chk);
@@ -351,7 +338,7 @@ async function sendMsg() {
     if (data.evidence) renderEvidence(data.evidence);
   } catch(e) {
     rmTyping();
-    addMsg('assistant', `<span style="color:rgba(255,107,53,.8)">⚠ BACKEND OFFLINE</span> — Could not reach <code style="font-family:Share Tech Mono,monospace;font-size:11px">/chat</code>. Start your FastAPI server and reload.`);
+    addMsg('a', `<span style="color:rgba(255,107,53,.8)">⚠ BACKEND OFFLINE</span> — Could not reach <code style="font-family:Share Tech Mono,monospace;font-size:11px">/chat</code>. Start your FastAPI server and reload.`);
   }
 
   setProc(false);
@@ -359,76 +346,95 @@ async function sendMsg() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VOICE
+// VOICE  (audio recorded in browser → sent to Python /transcribe
+//         → Whisper transcribes → text sent to /chat)
 // ══════════════════════════════════════════════════════════════════
-let recog       = null;
-let isListening = false;
+let mediaRecorder = null;
+let audioChunks   = [];
+let isListening   = false;
 
 const orbEl = document.getElementById('orb');
 const vq    = document.getElementById('voice-q');
 const va    = document.getElementById('voice-a');
 const vhint = document.getElementById('voice-hint');
 
-function buildRecog() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return null;
-  const r          = new SR();
-  r.continuous     = false;
-  r.interimResults = true;
-  r.lang           = 'en-US';
-
-  r.onresult = e => {
-    const t = Array.from(e.results).map(r => r[0].transcript).join('');
-    vq.textContent = t;
-    vq.classList.add('visible');
-  };
-
-  r.onend = () => {
-    const t = vq.textContent.trim();
+async function toggleVoice() {
+  // ── Already recording → stop ──
+  if (isListening) {
+    mediaRecorder.stop();
     isListening = false;
     orbEl.classList.remove('listening');
     vhint.textContent = 'PROCESSING…';
-    if (t) sendVoice(t);
-    else vhint.textContent = 'CLICK ORB TO SPEAK — PRESS & HOLD — OR TYPE';
-  };
-
-  r.onerror = () => {
-    isListening = false;
-    orbEl.classList.remove('listening');
-    vhint.textContent = 'CLICK ORB TO SPEAK';
-  };
-
-  return r;
-}
-
-function toggleVoice() {
-  if (!recog) { recog = buildRecog(); }
-  if (!recog) { vhint.textContent = 'SPEECH NOT SUPPORTED IN THIS BROWSER'; return; }
-
-  if (isListening) {
-    recog.stop();
-    isListening = false;
-    orbEl.classList.remove('listening');
-  } else {
-    vq.textContent = '';
-    vq.classList.remove('visible');
-    va.textContent = '';
-    va.classList.remove('visible');
-    recog.start();
-    isListening = true;
-    orbEl.classList.add('listening');
-    vhint.textContent = 'LISTENING…';
-    spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 30, [0, 255, 163]);
+    return;
   }
+
+  // ── Request microphone permission ──
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    vhint.textContent = 'MIC ACCESS DENIED';
+    return;
+  }
+
+  // ── Set up MediaRecorder ──
+  audioChunks   = [];
+  mediaRecorder = new MediaRecorder(stream);
+
+  // Collect audio data chunks while recording
+  mediaRecorder.ondataavailable = e => {
+    if (e.data.size > 0) audioChunks.push(e.data);
+  };
+
+  // ── When recording stops → send to Python /transcribe ──
+  mediaRecorder.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop());   // release microphone
+
+    const blob     = new Blob(audioChunks, { type: 'audio/webm' });
+    const formData = new FormData();
+    formData.append('audio', blob, 'recording.webm');
+
+    vhint.textContent = 'TRANSCRIBING…';
+    setProc(true);
+
+    try {
+      // Python receives this, runs Whisper, returns { transcript: "..." }
+      const res  = await fetch('/transcribe', { method: 'POST', body: formData });
+      const data = await res.json();
+      const text = data.transcript?.trim();
+
+      if (text) {
+        vq.textContent = text;          // show what was heard on screen
+        vq.classList.add('visible');
+        await sendVoice(text);          // send transcript to /chat
+      } else {
+        vhint.textContent = 'NOTHING HEARD — TRY AGAIN';
+        setProc(false);
+      }
+    } catch (err) {
+      vhint.textContent = 'TRANSCRIPTION FAILED';
+      setProc(false);
+    }
+  };
+
+  // ── Start recording ──
+  mediaRecorder.start();
+  isListening = true;
+  orbEl.classList.add('listening');
+  vhint.textContent = 'LISTENING… CLICK ORB TO STOP';
+  spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 30, [0, 255, 163]);
 }
 
 function stopVoice() {
-  if (recog && isListening) { recog.stop(); isListening = false; }
+  if (mediaRecorder && isListening) {
+    mediaRecorder.stop();
+    isListening = false;
+  }
   orbEl.classList.remove('listening', 'processing');
 }
 
 async function sendVoice(text) {
-  setProc(true);
+  setProc(true);   // FIX: ensure processing state is on for the full duration
   try {
     const res  = await fetch('/chat', {
       method:  'POST',
@@ -437,18 +443,21 @@ async function sendVoice(text) {
     });
     const data = await res.json();
     const ans  = data.answer || 'No response.';
+
     va.textContent = ans;
     va.classList.add('visible');
     vhint.textContent = 'CLICK ORB TO SPEAK AGAIN';
+
     const chk = data.evidence_count || 5;
     animMetrics(Math.floor(Math.random() * 120 + 30), Math.round(80 + Math.random() * 15), chk);
     confEl.textContent = Math.round(80 + Math.random() * 15) + '%';
+    if (data.evidence) renderEvidence(data.evidence);
 
-    // Text-to-speech
+    // ── Browser reads the answer aloud (text-to-speech) ──
     if ('speechSynthesis' in window) {
-      const u   = new SpeechSynthesisUtterance(ans);
-      u.rate    = .95;
-      u.pitch   = 1.05;
+      const u = new SpeechSynthesisUtterance(ans);
+      u.rate  = .95;
+      u.pitch = 1.05;
       window.speechSynthesis.speak(u);
     }
   } catch(e) {
@@ -459,8 +468,6 @@ async function sendVoice(text) {
   setProc(false);
 }
 
-// ══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
-// ══════════════════════════════════════════════════════════════════
 setTimeout(() => document.getElementById('sd-vec').className = 's-dot', 1200);
 setTimeout(() => document.getElementById('sd-llm').className = 's-dot', 2200);
