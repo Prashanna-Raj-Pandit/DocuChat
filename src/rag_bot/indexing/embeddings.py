@@ -13,7 +13,12 @@ from src.rag_bot.model import ChunkRecord
 class EmbeddingStore:
     def __init__(self) -> None:
         self.model = SentenceTransformer(config.embedding_model_name)
-        self.client = chromadb.PersistentClient(path=str(config.chroma_dir))
+        # self.client = chromadb.PersistentClient(path=str(config.chroma_dir))
+        self.client = chromadb.CloudClient(
+            api_key='ck-H429P89APX6LandziTabFDwKq75SmE5ZBe2UdKjXGhtZ',
+            tenant='21c0846a-bb0c-4d54-bc30-a75aee1b1a41',
+            database='DocuChat'
+        )
         self.collection: Collection = self.client.get_or_create_collection(
             name=config.chroma_collection_name,
             metadata={"description": "RAG chatbot knowledge base"}
