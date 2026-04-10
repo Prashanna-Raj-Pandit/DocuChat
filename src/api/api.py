@@ -1,19 +1,21 @@
-import os
-import tempfile
+from __future__ import annotations
+
+from pathlib import Path
 from typing import Optional, List
-from fastapi import FastAPI, UploadFile, File
+
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-import whisper
 
 from src.rag_bot.chat_cli import RetrievalChatCLI
 
+STATIC_DIR = Path(__file__).parents[2] / "static"
+
 app = FastAPI(title="RAG Chatbot")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 chat_bot = RetrievalChatCLI()
-whisper_model = whisper.load_model("tiny")
 
 
 class ChatRequest(BaseModel):
@@ -35,7 +37,7 @@ class ChatResponse(BaseModel):
 
 @app.get("/")
 def serve_ui():
-    return FileResponse("static/index.html")
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -59,26 +61,11 @@ async def chat(req: ChatRequest):
     )
 
 
-@app.post("/transcribe")
-async def transcribe(audio: UploadFile = File(...)):
-    """Receives audio blob from browser, Whisper transcribes it, returns text."""
-    contents = await audio.read()
-
-    with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
-        tmp.write(contents)
-        tmp_path = tmp.name
-
-    result = whisper_model.transcribe(tmp_path)
-    os.remove(tmp_path)
-
-    return {"transcript": result["text"].strip()}
-
-
 def _get_source(item) -> str:
     meta = item.metadata or {}
     return (
-            meta.get("source_name")
-            or meta.get("document_title")
-            or meta.get("path", "")
-            or "Knowledge Base"
+        meta.get("source_name")
+        or meta.get("document_title")
+        or meta.get("path", "")
+        or "Knowledge Base"
     )

@@ -3,17 +3,17 @@ from __future__ import annotations
 from typing import Any
 
 import chromadb
+import cohere
 
 from src.rag_bot.config import config
 from chromadb.api.models.Collection import Collection
-from sentence_transformers import SentenceTransformer
 from src.rag_bot.model import ChunkRecord
 
 
 class EmbeddingStore:
     def __init__(self) -> None:
-        self.model = SentenceTransformer(config.embedding_model_name)
-        # self.client = chromadb.PersistentClient(path=str(config.chroma_dir))
+        self.cohere_client = cohere.ClientV2(api_key=config.cohere_api_key)
+        self.embed_model = config.cohere_embed_model
         self.client = chromadb.CloudClient(
             api_key=config.chroma_api_key,
             tenant=config.chroma_tenant,
@@ -24,14 +24,18 @@ class EmbeddingStore:
             metadata={"description": "RAG chatbot knowledge base"}
         )
 
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        vectors = self.model.encode(texts, normalize_embeddings=True)
-        return vectors.tolist()
+    def embed_texts(self, texts: list[str], input_type: str = "search_query") -> list[list[float]]:
+        response = self.cohere_client.embed(
+            texts=texts,
+            model=self.embed_model,
+            input_type=input_type,
+            embedding_types=["float"]
+        )
+        return response.embeddings.float_
 
     @staticmethod
     def _normalize_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
         normalized: dict[str, Any] = {}
-
         for key, value in metadata.items():
             if isinstance(value, (str, int, float, bool)) or value is None:
                 normalized[key] = value
@@ -45,7 +49,7 @@ class EmbeddingStore:
             ids = [chunk.chunk_id for chunk in batch]
             docs = [chunk.text for chunk in batch]
             metadata = [self._normalize_metadata(chunk.metadata) for chunk in batch]
-            embeddings = self.embed_texts(docs)
+            embeddings = self.embed_texts(docs, input_type="search_document")
 
             self.collection.upsert(
                 ids=ids,
@@ -55,8 +59,8 @@ class EmbeddingStore:
             )
 
     def query(self, query_text: str, top_k: int = config.top_k_results, where: dict[str, Any] | None = None) -> dict[
-        str, Any]:
-        query_embeddings = self.embed_texts([query_text])[0]
+            str, Any]:
+        query_embeddings = self.embed_texts([query_text], input_type="search_query")[0]
         return self.collection.query(
             query_embeddings=[query_embeddings],
             n_results=top_k,

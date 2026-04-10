@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from dataclasses import dataclass, field
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +28,8 @@ class Config:
     chroma_api_key: str = os.getenv("CHROMA_API_KEY", "")
     chroma_tenant: str = os.getenv("CHROMA_TENANT", "")
     chroma_database: str = os.getenv("CHROMA_DATABASE", "DocuChat")
+
+    cohere_embed_model: str = os.getenv("COHERE_EMBED_MODEL", "embed-english-v3.0")
 
     phase3_output_dir: Path = ROOT / "output"
 
