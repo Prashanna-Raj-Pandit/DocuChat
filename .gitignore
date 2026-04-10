@@ -18,3 +18,4 @@ src/rag_bot/.env
 .env.*
 
 data
+.claude
