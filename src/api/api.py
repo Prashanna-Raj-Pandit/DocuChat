@@ -47,6 +47,36 @@ def serve_ui():
     return FileResponse(str(STATIC_DIR / "index.html"))
 
 
+@app.get("/catalog")
+def serve_catalog():
+    return FileResponse(str(STATIC_DIR / "catalog.html"))
+
+
+@app.get("/demos/support")
+def serve_demo_support():
+    return FileResponse(str(STATIC_DIR / "demos" / "support.html"))
+
+
+@app.get("/demos/legal")
+def serve_demo_legal():
+    return FileResponse(str(STATIC_DIR / "demos" / "legal.html"))
+
+
+@app.get("/demos/medical")
+def serve_demo_medical():
+    return FileResponse(str(STATIC_DIR / "demos" / "medical.html"))
+
+
+@app.get("/demos/retail")
+def serve_demo_retail():
+    return FileResponse(str(STATIC_DIR / "demos" / "retail.html"))
+
+
+@app.get("/demos/hr")
+def serve_demo_hr():
+    return FileResponse(str(STATIC_DIR / "demos" / "hr.html"))
+
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     answer, evidence_items = get_chat_bot().communicate_api(req.message)

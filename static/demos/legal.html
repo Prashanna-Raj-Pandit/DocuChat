@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LegalAI — Ask About Prashanna</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#090d1c;--surface:#0e1428;--surface2:#141932;--border:rgba(201,168,76,.12);
+  --acc:#c9a84c;--acc-light:rgba(201,168,76,.1);--acc-dk:#a8893c;
+  --txt:#e8e0cc;--txt2:#8a8070;--txt3:#4a4438;
+  --r:4px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt)}
+
+/* ── HEADER ── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(9,13,28,.94);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.h-brand{display:flex;align-items:center;gap:14px}
+.h-seal{width:36px;height:36px;border:1px solid var(--acc);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--acc);font-family:'Playfair Display',serif;font-size:15px;font-weight:700}
+.h-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--acc);letter-spacing:.5px}
+.h-div{width:1px;height:20px;background:var(--border)}
+.h-sub{font-size:10.5px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase}
+.h-badge{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);padding:3px 10px}
+.h-back{font-size:11px;font-weight:500;color:var(--txt2);text-decoration:none;display:flex;align-items:center;gap:5px;letter-spacing:.5px;transition:color .2s}
+.h-back:hover{color:var(--acc)}
+
+/* ── MAIN ── */
+main{display:flex;flex-direction:column;height:100vh;padding-top:64px}
+.chat-pane{flex:1;overflow-y:auto;padding:28px 16px;display:flex;flex-direction:column;gap:18px;max-width:760px;width:100%;margin:0 auto}
+
+/* ── WELCOME ── */
+.welcome{
+  background:var(--surface);border:1px solid var(--border);
+  padding:32px;text-align:center;
+}
+.welcome-crest{font-size:32px;margin-bottom:16px}
+.welcome h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--acc);margin-bottom:8px;font-weight:600}
+.welcome p{font-size:13.5px;color:var(--txt2);line-height:1.7;max-width:420px;margin:0 auto}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent);margin:18px auto;width:160px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{font-size:11.5px;font-weight:500;color:var(--acc);background:var(--acc-light);
+  padding:7px 16px;cursor:pointer;border:1px solid rgba(201,168,76,.25);
+  letter-spacing:.5px;transition:all .2s}
+.chip:hover{background:var(--acc);color:var(--bg)}
+
+/* ── MESSAGES ── */
+.msg{display:flex;gap:12px;align-items:flex-start;animation:fadeup .4s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:1px solid}
+.avatar.bot{border-color:var(--acc);color:var(--acc);font-family:'Playfair Display',serif;font-size:14px}
+.avatar.user{border-color:var(--txt3);color:var(--txt2)}
+.bubble{max-width:78%;padding:14px 18px;font-size:14px;line-height:1.7}
+.bubble.bot{background:var(--surface);border:1px solid var(--border);border-top-left-radius:0}
+.bubble.user{background:var(--acc-light);border:1px solid rgba(201,168,76,.2);border-top-right-radius:0;color:var(--txt)}
+.msg-time{font-size:10px;color:var(--txt3);margin-top:5px;letter-spacing:.5px}
+.msg.user .msg-time{text-align:right}
+
+/* ── SOURCES ── */
+.sources{
+  background:transparent;border-left:2px solid var(--acc);
+  padding:8px 12px;margin-top:8px;
+  font-size:11px;color:var(--txt2);letter-spacing:.5px;
+}
+.sources strong{color:var(--acc);font-weight:600}
+
+/* ── TYPING ── */
+.dot-row{display:flex;gap:5px;align-items:center}
+.dot-row span{width:6px;height:6px;border-radius:50%;background:var(--acc);opacity:.5;animation:bounce 1.2s infinite}
+.dot-row span:nth-child(2){animation-delay:.2s}
+.dot-row span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+/* ── INPUT ── */
+.input-bar{
+  border-top:1px solid var(--border);padding:20px 16px;
+  background:rgba(9,13,28,.96);backdrop-filter:blur(12px);
+}
+.input-inner{
+  max-width:760px;margin:0 auto;
+  display:flex;gap:10px;align-items:flex-end;
+  background:var(--surface);border:1px solid var(--border);
+  padding:12px 12px 12px 18px;
+  transition:border-color .2s;
+}
+.input-inner:focus-within{border-color:rgba(201,168,76,.4)}
+textarea{
+  flex:1;background:none;border:none;outline:none;resize:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--txt);
+  max-height:120px;line-height:1.5;
+}
+textarea::placeholder{color:var(--txt3)}
+.send-btn{
+  padding:9px 20px;background:transparent;border:1px solid var(--acc);
+  color:var(--acc);font-family:'DM Sans',sans-serif;font-size:11px;
+  font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;flex-shrink:0;transition:all .2s;white-space:nowrap;
+}
+.send-btn:hover{background:var(--acc);color:var(--bg)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed}
+.input-hint{text-align:center;font-size:10px;color:var(--txt3);margin-top:10px;letter-spacing:1px;text-transform:uppercase;max-width:760px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-brand">
+    <div class="h-seal">L</div>
+    <span class="h-name">LegalAI</span>
+    <div class="h-div"></div>
+    <span class="h-sub">Intelligence Platform</span>
+    <span class="h-badge">Live Demo</span>
+  </div>
+  <a class="h-back" href="/catalog">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    Return to Catalog
+  </a>
+</header>
+
+<main>
+  <div class="chat-pane" id="msgs">
+    <div class="welcome">
+      <div class="welcome-crest">⚖️</div>
+      <h2>LegalAI Intelligence</h2>
+      <div class="rule"></div>
+      <p>Precision-crafted responses about <strong style="color:var(--acc)">Prashanna Raj Pandit</strong> — his professional background, technical expertise, academic achievements, and project portfolio.</p>
+      <div class="rule"></div>
+      <div class="chips">
+        <button class="chip" onclick="quickSend('What is his educational background?')">Education</button>
+        <button class="chip" onclick="quickSend('Summarize his technical expertise')">Technical Expertise</button>
+        <button class="chip" onclick="quickSend('What research projects has he worked on?')">Research</button>
+        <button class="chip" onclick="quickSend('Tell me about his machine learning skills')">ML Skills</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-inner">
+      <textarea id="inp" rows="1" placeholder="Inquire about Prashanna's professional profile…"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">Submit</button>
+    </div>
+    <div class="input-hint">Enter to submit · Shift+Enter for new line</div>
+  </div>
+</main>
+
+<script>
+const msgs = document.getElementById('msgs');
+const inp = document.getElementById('inp');
+const sendBtn = document.getElementById('send-btn');
+
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+
+function addMsg(role, text, sources){
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const av = `<div class="avatar ${role}">${role==='bot'?'L':'U'}</div>`;
+  const bubble = `<div style="flex:1;min-width:0">
+    <div class="bubble ${role}">${text}</div>
+    ${role==='bot' && sources ? `<div class="sources"><strong>Sources:</strong> ${sources}</div>` : ''}
+    <div class="msg-time">${now()}</div>
+  </div>`;
+  div.innerHTML = role==='user' ? bubble+av : av+bubble;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping(){
+  const div = document.createElement('div');
+  div.className='msg';div.id='typing';
+  div.innerHTML=`<div class="avatar bot">L</div><div class="bubble bot"><div class="dot-row"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+async function sendMsg(){
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';sendBtn.disabled=true;
+  addMsg('user',text);showTyping();
+  try{
+    const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+    const data=await res.json();
+    hideTyping();
+    const src=data.evidence?.length?data.evidence.map(e=>e.source||'Knowledge Base').filter((v,i,a)=>a.indexOf(v)===i).join(' · '):null;
+    addMsg('bot',data.answer||'No response available.',src);
+  }catch(e){hideTyping();addMsg('bot','Connection error. Please try again.');}
+  sendBtn.disabled=false;inp.focus();
+}
+
+function quickSend(text){inp.value=text;sendMsg();}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,120)+'px';});
+</script>
+
+<!-- ── FLOATING CLUSTER ── -->
+<div id="fac">
+  <button class="fac-sat" id="fac-clear" data-tip="Clear" onclick="clearChat()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-rand" data-tip="Random" onclick="randomQ()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-copy" data-tip="Copy link" onclick="copyLink()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+  <button id="fac-main" onclick="toggleFac()">⚖</button>
+</div>
+<div id="toast"></div>
+
+<style>
+#fac{position:fixed;bottom:28px;right:28px;z-index:400;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+#fac-main{
+  width:48px;height:48px;border-radius:0;
+  background:transparent;border:1px solid var(--acc);cursor:pointer;color:var(--acc);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 4px 20px rgba(201,168,76,.2);
+  transition:transform .25s,background .25s,box-shadow .25s;position:relative;z-index:2;
+}
+#fac-main:hover{background:var(--acc);color:var(--bg);box-shadow:0 6px 28px rgba(201,168,76,.4)}
+#fac.open #fac-main{background:var(--acc);color:var(--bg)}
+.fac-sat{
+  position:absolute;width:38px;height:38px;border-radius:0;
+  border:1px solid;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translate(0,0) scale(0.4);
+  transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;z-index:1;
+}
+#fac.open .fac-sat{opacity:1;pointer-events:all}
+#fac.open #fac-clear{transform:translate(0,-60px) scale(1);transition-delay:0s;background:#2a0e0e;color:#e05252;border-color:rgba(224,82,82,.4)}
+#fac.open #fac-rand{transform:translate(-52px,-34px) scale(1);transition-delay:.06s;background:var(--surface);color:var(--acc);border-color:rgba(201,168,76,.3)}
+#fac.open #fac-copy{transform:translate(-60px,16px) scale(1);transition-delay:.12s;background:var(--surface);color:var(--acc2);border-color:rgba(17,138,178,.3)}
+.fac-sat:hover{filter:brightness(1.2);transform:scale(1.1) !important}
+.fac-sat::before{
+  content:attr(data-tip);position:absolute;right:46px;
+  background:rgba(9,13,28,.95);color:var(--txt);
+  padding:4px 10px;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
+  border:1px solid var(--border);font-family:'DM Sans',sans-serif;
+}
+.fac-sat:hover::before{opacity:1}
+#toast{
+  position:fixed;bottom:86px;right:28px;z-index:500;
+  background:var(--surface);color:var(--acc);padding:7px 16px;
+  font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  border:1px solid var(--border);font-family:'DM Sans',sans-serif;
+  opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+
+<script>
+const fac=document.getElementById('fac');
+const toast=document.getElementById('toast');
+function toggleFac(){fac.classList.toggle('open')}
+document.addEventListener('click',e=>{if(!fac.contains(e.target))fac.classList.remove('open');});
+
+const RANDOM_QS=[
+  'What is his educational background?',
+  'What research has he published or contributed to?',
+  'Summarize his professional experience',
+  'What are his core competencies?',
+  'Has he worked in regulated or compliance-sensitive domains?',
+  'What is his expertise in NLP?',
+  'Describe his project management experience',
+  'What AI frameworks has he used professionally?',
+];
+
+function randomQ(){fac.classList.remove('open');inp.value=RANDOM_QS[Math.floor(Math.random()*RANDOM_QS.length)];sendMsg();}
+function clearChat(){fac.classList.remove('open');[...msgs.children].slice(1).forEach(k=>k.remove());showToast('Record cleared')}
+function copyLink(){fac.classList.remove('open');navigator.clipboard.writeText(window.location.href).then(()=>showToast('Link copied')).catch(()=>showToast('Copy failed'))}
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000)}
+</script>
+</body>
+</html>

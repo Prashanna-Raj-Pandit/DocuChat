@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SupportAI — Ask About Prashanna</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fffaf6;--surface:#ffffff;--border:#f0e8e0;
+  --acc:#ff6b35;--acc-dk:#e5521c;--acc-light:#fff0eb;
+  --txt:#1a1209;--txt2:#7a6a5a;--txt3:#b0a090;
+  --r:16px;--shadow:0 4px 24px rgba(255,107,53,.1);
+}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt)}
+
+/* ── HEADER ── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(255,250,246,.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.h-brand{display:flex;align-items:center;gap:10px}
+.h-logo{width:34px;height:34px;border-radius:10px;background:var(--acc);display:flex;align-items:center;justify-content:center}
+.h-logo svg{color:#fff}
+.h-name{font-size:17px;font-weight:800;color:var(--txt)}
+.h-badge{font-size:10px;font-weight:700;background:var(--acc-light);color:var(--acc);padding:3px 8px;border-radius:20px;letter-spacing:.5px}
+.h-back{font-size:12px;font-weight:700;color:var(--txt2);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .2s}
+.h-back:hover{color:var(--acc)}
+
+/* ── MAIN ── */
+main{
+  display:flex;flex-direction:column;height:100vh;
+  padding-top:60px;
+}
+.chat-pane{
+  flex:1;overflow-y:auto;padding:24px 16px;
+  display:flex;flex-direction:column;gap:16px;
+  max-width:720px;width:100%;margin:0 auto;
+}
+
+/* ── WELCOME CARD ── */
+.welcome{
+  background:var(--surface);border-radius:var(--r);
+  padding:28px;border:1px solid var(--border);
+  text-align:center;box-shadow:var(--shadow);
+}
+.welcome-icon{width:56px;height:56px;border-radius:50%;background:var(--acc-light);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px}
+.welcome h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.welcome p{font-size:13.5px;color:var(--txt2);line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.chip{font-size:12px;font-weight:700;background:var(--acc-light);color:var(--acc);
+  padding:6px 14px;border-radius:20px;cursor:pointer;border:none;transition:all .2s}
+.chip:hover{background:var(--acc);color:#fff;transform:translateY(-1px)}
+
+/* ── MESSAGES ── */
+.msg{display:flex;gap:10px;align-items:flex-start;animation:fadeup .35s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.avatar.bot{background:var(--acc);color:#fff}
+.avatar.user{background:var(--txt);color:#fff}
+.bubble{
+  max-width:78%;padding:12px 16px;border-radius:var(--r);
+  font-size:14px;line-height:1.65;
+}
+.bubble.bot{background:var(--surface);border:1px solid var(--border);border-top-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.bubble.user{background:var(--acc);color:#fff;border-top-right-radius:4px}
+.msg-time{font-size:10px;color:var(--txt3);margin-top:4px;text-align:right}
+
+/* ── SOURCES ── */
+.sources{background:var(--acc-light);border-radius:10px;padding:10px 12px;margin-top:6px;font-size:11.5px;color:var(--acc-dk);font-weight:700}
+.sources span{opacity:.7;font-weight:600}
+
+/* ── TYPING ── */
+.typing .bubble.bot{padding:14px 18px}
+.dot-row{display:flex;gap:5px;align-items:center}
+.dot-row span{width:7px;height:7px;border-radius:50%;background:var(--txt3);animation:bounce 1.2s infinite}
+.dot-row span:nth-child(2){animation-delay:.2s}
+.dot-row span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* ── INPUT ── */
+.input-bar{
+  background:rgba(255,250,246,.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);padding:16px;
+}
+.input-inner{
+  max-width:720px;margin:0 auto;
+  display:flex;gap:10px;align-items:flex-end;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:10px 10px 10px 16px;
+  transition:border-color .2s;box-shadow:var(--shadow);
+}
+.input-inner:focus-within{border-color:var(--acc)}
+textarea{
+  flex:1;background:none;border:none;outline:none;resize:none;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  color:var(--txt);max-height:120px;line-height:1.5;
+}
+textarea::placeholder{color:var(--txt3)}
+.send-btn{
+  width:38px;height:38px;border-radius:10px;background:var(--acc);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:#fff;transition:all .2s;flex-shrink:0;
+}
+.send-btn:hover{background:var(--acc-dk);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.input-hint{text-align:center;font-size:11px;color:var(--txt3);margin-top:8px;font-weight:600;max-width:720px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-brand">
+    <div class="h-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <span class="h-name">SupportAI</span>
+    <span class="h-badge">LIVE DEMO</span>
+  </div>
+  <a class="h-back" href="/catalog">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Catalog
+  </a>
+</header>
+
+<main>
+  <div class="chat-pane" id="msgs">
+    <div class="welcome">
+      <div class="welcome-icon">👋</div>
+      <h2>Hi! I'm SupportAI</h2>
+      <p>I'm here to answer all your questions about <strong>Prashanna Raj Pandit</strong> — his experience, skills, projects, and more.</p>
+      <div class="chips">
+        <button class="chip" onclick="quickSend('What are his technical skills?')">Technical Skills</button>
+        <button class="chip" onclick="quickSend('Tell me about his projects')">Projects</button>
+        <button class="chip" onclick="quickSend('What certifications does he have?')">Certifications</button>
+        <button class="chip" onclick="quickSend('What is his work experience?')">Experience</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-inner">
+      <textarea id="inp" rows="1" placeholder="Ask about Prashanna's skills, projects, experience…"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">ENTER to send · SHIFT+ENTER for newline</div>
+  </div>
+</main>
+
+<script>
+const msgs = document.getElementById('msgs');
+const inp = document.getElementById('inp');
+const sendBtn = document.getElementById('send-btn');
+
+function now(){
+  return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+function addMsg(role, text, sources){
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const av = `<div class="avatar ${role}">${role==='bot'?'S':'U'}</div>`;
+  const bubble = `<div>
+    <div class="bubble ${role}">${text}</div>
+    ${role==='bot' && sources ? `<div class="sources"><span>Sources retrieved: </span>${sources}</div>` : ''}
+    <div class="msg-time">${now()}</div>
+  </div>`;
+  div.innerHTML = role==='user' ? bubble+av : av+bubble;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function showTyping(){
+  const div = document.createElement('div');
+  div.className = 'msg typing';
+  div.id = 'typing';
+  div.innerHTML = `<div class="avatar bot">S</div><div class="bubble bot"><div class="dot-row"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping(){
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+async function sendMsg(){
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value = '';
+  inp.style.height = 'auto';
+  sendBtn.disabled = true;
+  addMsg('user', text);
+  showTyping();
+  try{
+    const res = await fetch('/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text})
+    });
+    const data = await res.json();
+    hideTyping();
+    const src = data.evidence && data.evidence.length > 0 ? data.evidence.map(e=>e.source||'Knowledge Base').filter((v,i,a)=>a.indexOf(v)===i).join(', ') : null;
+    addMsg('bot', data.answer || 'Sorry, I could not find an answer.', src);
+  } catch(e){
+    hideTyping();
+    addMsg('bot','Connection error. Please try again.');
+  }
+  sendBtn.disabled = false;
+  inp.focus();
+}
+
+function quickSend(text){
+  inp.value = text;
+  sendMsg();
+}
+
+inp.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){e.preventDefault();sendMsg();}
+});
+inp.addEventListener('input',()=>{
+  inp.style.height='auto';
+  inp.style.height=Math.min(inp.scrollHeight,120)+'px';
+});
+</script>
+
+<!-- ── FLOATING CLUSTER ── -->
+<div id="fac">
+  <button class="fac-sat" id="fac-clear" data-tip="Clear chat" onclick="clearChat()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-rand" data-tip="Random question" onclick="randomQ()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-copy" data-tip="Copy link" onclick="copyLink()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+  <button id="fac-main" onclick="toggleFac()">
+    <svg class="fac-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
+<div id="toast"></div>
+
+<style>
+#fac{position:fixed;bottom:28px;right:28px;z-index:400;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+#fac-main{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--acc);border:none;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(255,107,53,.4);
+  transition:transform .25s,box-shadow .25s;position:relative;z-index:2;
+}
+#fac-main:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(255,107,53,.55)}
+#fac.open #fac-main .fac-plus{transform:rotate(45deg)}
+.fac-plus{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.fac-sat{
+  position:absolute;width:40px;height:40px;border-radius:50%;
+  border:none;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translate(0,0) scale(0.4);
+  transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;z-index:1;box-shadow:0 3px 12px rgba(0,0,0,.25);
+}
+#fac.open .fac-sat{opacity:1;pointer-events:all}
+#fac.open #fac-clear{transform:translate(0,-66px) scale(1);transition-delay:0s;background:#e05252}
+#fac.open #fac-rand{transform:translate(-54px,-38px) scale(1);transition-delay:.06s;background:#7c3aed}
+#fac.open #fac-copy{transform:translate(-64px,16px) scale(1);transition-delay:.12s;background:#0ea5e9}
+.fac-sat:hover{filter:brightness(1.15);transform:scale(1.12) !important}
+.fac-sat::before{
+  content:attr(data-tip);position:absolute;right:48px;
+  background:rgba(0,0,0,.82);color:#fff;
+  padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
+  font-family:'Nunito',sans-serif;
+}
+.fac-sat:hover::before{opacity:1}
+#toast{
+  position:fixed;bottom:88px;right:28px;z-index:500;
+  background:rgba(0,0,0,.85);color:#fff;padding:8px 18px;
+  border-radius:8px;font-size:12px;font-weight:700;
+  font-family:'Nunito',sans-serif;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .25s,transform .25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+
+<script>
+const fac=document.getElementById('fac');
+const toast=document.getElementById('toast');
+function toggleFac(){fac.classList.toggle('open')}
+document.addEventListener('click',e=>{if(!fac.contains(e.target))fac.classList.remove('open');});
+
+const RANDOM_QS=[
+  'What are his strongest technical skills?',
+  'Tell me about his machine learning projects',
+  'What certifications does he hold?',
+  'What programming languages does he know?',
+  'How does he approach AI system design?',
+  'What is his experience with RAG systems?',
+  'Has he worked with cloud platforms?',
+  'What is his educational background?',
+];
+
+function randomQ(){
+  fac.classList.remove('open');
+  const q=RANDOM_QS[Math.floor(Math.random()*RANDOM_QS.length)];
+  inp.value=q;sendMsg();
+}
+
+function clearChat(){
+  fac.classList.remove('open');
+  const kids=[...msgs.children];
+  kids.slice(1).forEach(k=>k.remove());
+  showToast('Chat cleared');
+}
+
+function copyLink(){
+  fac.classList.remove('open');
+  navigator.clipboard.writeText(window.location.href).then(()=>showToast('Link copied!')).catch(()=>showToast('Copy failed'));
+}
+
+function showToast(msg){
+  toast.textContent=msg;toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+}
+</script>
+</body>
+</html>
