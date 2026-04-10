@@ -20,7 +20,8 @@
 
 ---
 
-## [Explore catalog](!https://docu-chat.vercel.app/catalog)
+## [Explore catalog](!https://docu-chat.vercel.app/catalog) (https://docu-chat.vercel.app/catalog)
+
 
 <img src="images/landing.png"></img>
 <img src="images/legal.png"></img>
