@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HRBot — Ask About Prashanna</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#001219;--surface:#001e28;--surface2:#002a38;--border:rgba(6,214,160,.1);
+  --acc:#06d6a0;--acc2:#118ab2;--acc-light:rgba(6,214,160,.08);
+  --txt:#d4fff6;--txt2:#5a9a8a;--txt3:#2a5a50;
+  --r:10px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt)}
+
+/* ── GRID BG ── */
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(6,214,160,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,214,160,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* ── HEADER ── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(0,18,25,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.h-left{display:flex;align-items:center;gap:16px}
+.h-icon{width:36px;height:36px;border-radius:8px;border:1px solid var(--acc);display:flex;align-items:center;justify-content:center;color:var(--acc)}
+.h-brand-text{}
+.h-name{font-size:16px;font-weight:700;color:var(--acc);letter-spacing:.5px}
+.h-sub{font-size:10px;color:var(--txt2);letter-spacing:2px;text-transform:uppercase}
+.h-right{display:flex;align-items:center;gap:14px}
+.h-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt2);font-weight:500}
+.h-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc);animation:glow 2s infinite}
+@keyframes glow{0%,100%{opacity:1;box-shadow:0 0 6px var(--acc)}50%{opacity:.4;box-shadow:0 0 2px var(--acc)}}
+.h-back{font-size:12px;font-weight:600;color:var(--txt2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid var(--border);border-radius:6px;transition:all .2s}
+.h-back:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-light)}
+
+/* ── MAIN ── */
+main{display:flex;flex-direction:column;height:100vh;padding-top:62px;position:relative;z-index:1}
+.chat-pane{flex:1;overflow-y:auto;padding:24px 16px;display:flex;flex-direction:column;gap:14px;max-width:740px;width:100%;margin:0 auto}
+
+/* ── WELCOME ── */
+.welcome{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:28px;box-shadow:0 0 40px rgba(6,214,160,.05);
+}
+.welcome-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.welcome-badge{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--acc);border:1px solid rgba(6,214,160,.4);padding:3px 10px;border-radius:4px;
+}
+.welcome-header h2{font-size:20px;font-weight:700;color:var(--acc)}
+.profile-card{
+  background:var(--surface2);border-radius:8px;padding:16px;margin-bottom:18px;
+  border:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;
+}
+.profile-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+.profile-info{}
+.profile-name{font-size:15px;font-weight:700;color:var(--txt)}
+.profile-title{font-size:12px;color:var(--txt2);margin-top:2px}
+.profile-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ptag{font-size:10px;font-weight:600;color:var(--acc2);background:rgba(17,138,178,.1);padding:2px 8px;border-radius:4px;border:1px solid rgba(17,138,178,.2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:12px;font-weight:600;color:var(--acc);background:var(--acc-light);
+  padding:7px 16px;border-radius:6px;cursor:pointer;border:1px solid rgba(6,214,160,.2);
+  transition:all .2s;letter-spacing:.3px}
+.chip:hover{background:var(--acc);color:var(--bg);transform:translateY(-1px)}
+
+/* ── MESSAGES ── */
+.msg{display:flex;gap:10px;align-items:flex-start;animation:fadeup .35s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.5px}
+.avatar.bot{background:linear-gradient(135deg,var(--acc),var(--acc2));color:var(--bg)}
+.avatar.user{background:var(--surface2);color:var(--txt2);border:1px solid var(--border)}
+.bubble{max-width:78%;padding:12px 16px;border-radius:10px;font-size:13.5px;line-height:1.65}
+.bubble.bot{background:var(--surface);border:1px solid var(--border);border-top-left-radius:3px}
+.bubble.user{background:rgba(6,214,160,.12);border:1px solid rgba(6,214,160,.2);border-top-right-radius:3px;color:var(--txt)}
+.msg-time{font-size:10px;color:var(--txt3);margin-top:4px;letter-spacing:.5px}
+.msg.user .msg-time{text-align:right}
+
+/* ── SOURCES ── */
+.sources{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.src-label{font-size:10px;color:var(--txt3);font-weight:500}
+.src-chip{font-size:10px;font-weight:600;color:var(--acc);background:var(--acc-light);padding:2px 8px;border-radius:4px;border:1px solid rgba(6,214,160,.15)}
+
+/* ── TYPING ── */
+.dot-row{display:flex;gap:5px;align-items:center}
+.dot-row span{width:6px;height:6px;border-radius:50%;background:var(--acc);animation:blink 1.2s ease-in-out infinite}
+.dot-row span:nth-child(2){animation-delay:.2s}
+.dot-row span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* ── INPUT ── */
+.input-bar{border-top:1px solid var(--border);padding:16px;background:rgba(0,18,25,.95);backdrop-filter:blur(12px)}
+.input-inner{
+  max-width:740px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 10px 10px 16px;transition:border-color .2s,box-shadow .2s;
+}
+.input-inner:focus-within{border-color:rgba(6,214,160,.3);box-shadow:0 0 0 3px rgba(6,214,160,.06)}
+textarea{flex:1;background:none;border:none;outline:none;resize:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--txt);max-height:120px;line-height:1.5}
+textarea::placeholder{color:var(--txt3)}
+.send-btn{width:38px;height:38px;border-radius:8px;background:var(--acc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);flex-shrink:0;transition:all .2s}
+.send-btn:hover{filter:brightness(1.1);transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.input-hint{text-align:center;font-size:10px;color:var(--txt3);margin-top:8px;letter-spacing:1px;text-transform:uppercase;max-width:740px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<header>
+  <div class="h-left">
+    <div class="h-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="h-brand-text">
+      <div class="h-name">HRBot</div>
+      <div class="h-sub">Talent Intelligence</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="h-indicator"><div class="h-dot"></div>Profile Active</div>
+    <a class="h-back" href="/catalog">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Catalog
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="chat-pane" id="msgs">
+    <div class="welcome">
+      <div class="welcome-header">
+        <div class="welcome-badge">Candidate Profile</div>
+        <h2>HRBot Intelligence</h2>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar">P</div>
+        <div class="profile-info">
+          <div class="profile-name">Prashanna Raj Pandit</div>
+          <div class="profile-title">Machine Learning Engineer · AI Developer</div>
+          <div class="profile-tags">
+            <span class="ptag">Python</span>
+            <span class="ptag">Machine Learning</span>
+            <span class="ptag">RAG Systems</span>
+            <span class="ptag">NLP</span>
+            <span class="ptag">FastAPI</span>
+          </div>
+        </div>
+      </div>
+      <div class="chips">
+        <button class="chip" onclick="quickSend('Is he a good fit for a machine learning engineer role?')">ML Engineer Fit</button>
+        <button class="chip" onclick="quickSend('What soft skills does he have?')">Soft Skills</button>
+        <button class="chip" onclick="quickSend('Summarize his resume in 3 sentences')">Resume Summary</button>
+        <button class="chip" onclick="quickSend('What is his experience with AI models?')">AI Experience</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-inner">
+      <textarea id="inp" rows="1" placeholder="Ask about Prashanna's profile, skills, or suitability…"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter to send · Shift+Enter for new line</div>
+  </div>
+</main>
+
+<script>
+const msgs=document.getElementById('msgs');
+const inp=document.getElementById('inp');
+const sendBtn=document.getElementById('send-btn');
+
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+
+function addMsg(role,text,evidence){
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const av=`<div class="avatar ${role}">HR</div>`;
+  let srcHtml='';
+  if(role==='bot'&&evidence&&evidence.length){
+    const uniq=[...new Set(evidence.map(e=>e.source||'Knowledge Base'))];
+    srcHtml=`<div class="sources"><span class="src-label">Sources:</span>${uniq.map(s=>`<span class="src-chip">${s}</span>`).join('')}</div>`;
+  }
+  const bubble=`<div style="flex:1;min-width:0">
+    <div class="bubble ${role}">${text}</div>
+    ${srcHtml}
+    <div class="msg-time">${now()}</div>
+  </div>`;
+  div.innerHTML=role==='user'?bubble+av:av+bubble;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function showTyping(){
+  const div=document.createElement('div');div.className='msg';div.id='typing';
+  div.innerHTML=`<div class="avatar bot">HR</div><div class="bubble bot"><div class="dot-row"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+async function sendMsg(){
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';sendBtn.disabled=true;
+  addMsg('user',text);showTyping();
+  try{
+    const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+    const data=await res.json();
+    hideTyping();
+    addMsg('bot',data.answer||'No profile data available.',data.evidence);
+  }catch(e){hideTyping();addMsg('bot','Connection error. Please try again.');}
+  sendBtn.disabled=false;inp.focus();
+}
+
+function quickSend(text){inp.value=text;sendMsg();}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,120)+'px';});
+</script>
+
+<!-- ── FLOATING CLUSTER ── -->
+<div id="fac">
+  <button class="fac-sat" id="fac-clear" data-tip="Clear session" onclick="clearChat()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-rand" data-tip="Screen candidate" onclick="randomQ()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+  </button>
+  <button class="fac-sat" id="fac-copy" data-tip="Share profile" onclick="copyLink()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  </button>
+  <button id="fac-main" onclick="toggleFac()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </button>
+</div>
+<div id="toast"></div>
+
+<style>
+#fac{position:fixed;bottom:28px;right:28px;z-index:400;width:50px;height:50px;display:flex;align-items:center;justify-content:center}
+#fac-main{
+  width:50px;height:50px;border-radius:12px;
+  background:transparent;border:1px solid var(--acc);cursor:pointer;color:var(--acc);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(6,214,160,.15),0 0 0 0 rgba(6,214,160,.2);
+  transition:all .25s;position:relative;z-index:2;
+  animation:hrpulse 3s ease-in-out infinite;
+}
+@keyframes hrpulse{0%,100%{box-shadow:0 4px 20px rgba(6,214,160,.15),0 0 0 0 rgba(6,214,160,.15)}50%{box-shadow:0 4px 24px rgba(6,214,160,.3),0 0 0 6px rgba(6,214,160,.06)}}
+#fac-main:hover{background:var(--acc);color:var(--bg);animation:none;transform:scale(1.06)}
+#fac.open #fac-main{background:rgba(6,214,160,.15);animation:none}
+.fac-sat{
+  position:absolute;width:40px;height:40px;border-radius:10px;
+  border:1px solid var(--border);cursor:pointer;color:var(--acc);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface2);
+  opacity:0;transform:translate(0,0) scale(0.4);
+  transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;z-index:1;
+}
+#fac.open .fac-sat{opacity:1;pointer-events:all}
+#fac.open #fac-clear{transform:translate(0,-62px) scale(1);transition-delay:0s;color:#ef4444;border-color:rgba(239,68,68,.3)}
+#fac.open #fac-rand{transform:translate(-54px,-36px) scale(1);transition-delay:.06s}
+#fac.open #fac-copy{transform:translate(-62px,14px) scale(1);transition-delay:.12s;color:var(--acc2);border-color:rgba(17,138,178,.3)}
+.fac-sat:hover{border-color:var(--acc);filter:brightness(1.2);transform:scale(1.1) !important}
+.fac-sat::before{
+  content:attr(data-tip);position:absolute;right:48px;
+  background:rgba(0,18,25,.95);color:var(--txt);border:1px solid var(--border);
+  padding:4px 10px;border-radius:6px;font-size:10.5px;font-weight:600;letter-spacing:.5px;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
+  font-family:'DM Sans',sans-serif;
+}
+.fac-sat:hover::before{opacity:1}
+#toast{
+  position:fixed;bottom:86px;right:28px;z-index:500;
+  background:var(--surface);color:var(--acc);border:1px solid rgba(6,214,160,.2);
+  padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;
+  font-family:'DM Sans',sans-serif;letter-spacing:.3px;
+  opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+
+<script>
+const fac=document.getElementById('fac');
+const toast=document.getElementById('toast');
+function toggleFac(){fac.classList.toggle('open')}
+document.addEventListener('click',e=>{if(!fac.contains(e.target))fac.classList.remove('open');});
+
+const RANDOM_QS=[
+  'Is Prashanna a good fit for a senior ML engineer role?',
+  'What leadership or collaboration experience does he have?',
+  'Summarize his profile in 3 bullet points',
+  'Does he have experience with production ML systems?',
+  'What makes him a strong candidate for AI roles?',
+  'What is his experience with large language models?',
+  'Has he mentored others or led technical teams?',
+  'What industries has he worked in?',
+];
+
+function randomQ(){fac.classList.remove('open');inp.value=RANDOM_QS[Math.floor(Math.random()*RANDOM_QS.length)];sendMsg();}
+function clearChat(){fac.classList.remove('open');[...msgs.children].slice(1).forEach(k=>k.remove());showToast('Session cleared')}
+function copyLink(){fac.classList.remove('open');navigator.clipboard.writeText(window.location.href).then(()=>showToast('Profile link copied!')).catch(()=>showToast('Copy failed'))}
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000)}
+</script>
+</body>
+</html>

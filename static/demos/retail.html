@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RetailBot — Ask About Prashanna</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#110016;--surface:#1a0020;--surface2:#220028;--border:rgba(255,0,110,.12);
+  --acc:#ff006e;--acc2:#ffbe0b;--acc3:#8338ec;
+  --acc-light:rgba(255,0,110,.1);--acc2-light:rgba(255,190,11,.1);
+  --txt:#fff0f8;--txt2:#c080a0;--txt3:#7a4060;
+  --r:12px;
+}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--txt)}
+
+/* ── ANIMATED BG ── */
+.bg-blobs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.blob1{width:400px;height:400px;background:var(--acc);top:-100px;right:-100px;animation:drift 8s ease-in-out infinite}
+.blob2{width:300px;height:300px;background:var(--acc3);bottom:-80px;left:-80px;animation:drift 11s ease-in-out infinite reverse}
+.blob3{width:200px;height:200px;background:var(--acc2);top:40%;left:50%;animation:drift 9s ease-in-out infinite 2s}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+
+/* ── HEADER ── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(17,0,22,.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.h-brand{display:flex;align-items:center;gap:12px}
+.h-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc3));display:flex;align-items:center;justify-content:center;font-size:18px}
+.h-name{font-size:19px;font-weight:900;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.5px}
+.h-badge{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;background:var(--acc);color:#fff;padding:3px 10px;border-radius:20px}
+.h-back{font-size:12px;font-weight:800;color:var(--txt2);text-decoration:none;display:flex;align-items:center;gap:5px;padding:7px 16px;border:1px solid rgba(255,0,110,.3);border-radius:20px;transition:all .2s}
+.h-back:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-light)}
+
+/* ── MAIN ── */
+main{display:flex;flex-direction:column;height:100vh;padding-top:60px;position:relative;z-index:1}
+.chat-pane{flex:1;overflow-y:auto;padding:24px 16px;display:flex;flex-direction:column;gap:14px;max-width:720px;width:100%;margin:0 auto}
+
+/* ── WELCOME ── */
+.welcome{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:28px;text-align:center;
+  box-shadow:0 0 40px rgba(255,0,110,.1);
+}
+.welcome-emoji{font-size:40px;margin-bottom:12px}
+.welcome h2{font-size:22px;font-weight:900;margin-bottom:6px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome p{font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{font-size:12px;font-weight:800;padding:8px 16px;border-radius:20px;cursor:pointer;border:none;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.chip:nth-child(odd){background:var(--acc-light);color:var(--acc);border:1px solid rgba(255,0,110,.3)}
+.chip:nth-child(even){background:var(--acc2-light);color:var(--acc2);border:1px solid rgba(255,190,11,.3)}
+.chip:hover{transform:translateY(-2px) scale(1.05)}
+.chip:nth-child(odd):hover{background:var(--acc);color:#fff}
+.chip:nth-child(even):hover{background:var(--acc2);color:var(--bg)}
+
+/* ── MESSAGES ── */
+.msg{display:flex;gap:10px;align-items:flex-start;animation:pop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+.avatar.bot{background:linear-gradient(135deg,var(--acc),var(--acc3))}
+.avatar.user{background:var(--surface2);color:var(--txt2);border:1px solid var(--border)}
+.bubble{max-width:78%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.65;font-weight:700}
+.bubble.bot{background:var(--surface);border:1px solid var(--border);border-top-left-radius:4px}
+.bubble.user{background:linear-gradient(135deg,var(--acc),var(--acc3));color:#fff;border-top-right-radius:4px}
+.msg-time{font-size:10px;color:var(--txt3);margin-top:4px;font-weight:700}
+.msg.user .msg-time{text-align:right}
+
+/* ── SOURCES ── */
+.sources{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.src-tag{font-size:10px;font-weight:800;background:rgba(255,190,11,.12);color:var(--acc2);padding:2px 8px;border-radius:10px;border:1px solid rgba(255,190,11,.2)}
+
+/* ── TYPING ── */
+.dot-row{display:flex;gap:4px;align-items:center}
+.dot-row span{width:8px;height:8px;border-radius:50%;animation:jump 1s infinite}
+.dot-row span:nth-child(1){background:var(--acc);animation-delay:0s}
+.dot-row span:nth-child(2){background:var(--acc2);animation-delay:.15s}
+.dot-row span:nth-child(3){background:var(--acc3);animation-delay:.3s}
+@keyframes jump{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
+
+/* ── INPUT ── */
+.input-bar{
+  border-top:1px solid var(--border);padding:16px;
+  background:rgba(17,0,22,.95);backdrop-filter:blur(12px);
+}
+.input-inner{
+  max-width:720px;margin:0 auto;display:flex;gap:10px;align-items:flex-end;
+  background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
+  padding:10px 10px 10px 16px;transition:border-color .2s;
+}
+.input-inner:focus-within{border-color:rgba(255,0,110,.4);box-shadow:0 0 0 3px rgba(255,0,110,.08)}
+textarea{flex:1;background:none;border:none;outline:none;resize:none;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--txt);max-height:120px;line-height:1.5}
+textarea::placeholder{color:var(--txt3)}
+.send-btn{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--acc),var(--acc3));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:all .2s}
+.send-btn:hover{transform:scale(1.08);filter:brightness(1.1)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.input-hint{text-align:center;font-size:10px;font-weight:800;color:var(--txt3);margin-top:8px;letter-spacing:1px;text-transform:uppercase;max-width:720px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<div class="bg-blobs"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
+
+<header>
+  <div class="h-brand">
+    <div class="h-logo">🛍️</div>
+    <span class="h-name">RetailBot</span>
+    <span class="h-badge">Live Demo</span>
+  </div>
+  <a class="h-back" href="/catalog">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
+    Catalog
+  </a>
+</header>
+
+<main>
+  <div class="chat-pane" id="msgs">
+    <div class="welcome">
+      <div class="welcome-emoji">✨</div>
+      <h2>Hey, I'm RetailBot!</h2>
+      <p>Your energetic AI guide to everything about <strong style="color:var(--acc)">Prashanna Raj Pandit</strong>. Ask me anything — I've got the details!</p>
+      <div class="chips">
+        <button class="chip" onclick="quickSend('What makes Prashanna stand out?')">What's Special?</button>
+        <button class="chip" onclick="quickSend('Tell me about his best projects')">Top Projects</button>
+        <button class="chip" onclick="quickSend('What are his Python skills?')">Python Skills</button>
+        <button class="chip" onclick="quickSend('Any cool AI projects?')">AI Projects</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-inner">
+      <textarea id="inp" rows="1" placeholder="Ask anything about Prashanna…"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter to send · Shift+Enter for newline</div>
+  </div>
+</main>
+
+<script>
+const msgs=document.getElementById('msgs');
+const inp=document.getElementById('inp');
+const sendBtn=document.getElementById('send-btn');
+
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+
+function addMsg(role,text,evidence){
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const av=`<div class="avatar ${role}">${role==='bot'?'🛍️':'U'}</div>`;
+  let srcHtml='';
+  if(role==='bot'&&evidence&&evidence.length){
+    const uniq=[...new Set(evidence.map(e=>e.source||'Knowledge Base'))];
+    srcHtml=`<div class="sources">${uniq.map(s=>`<span class="src-tag">${s}</span>`).join('')}</div>`;
+  }
+  const bubble=`<div style="flex:1;min-width:0">
+    <div class="bubble ${role}">${text}</div>
+    ${srcHtml}
+    <div class="msg-time">${now()}</div>
+  </div>`;
+  div.innerHTML=role==='user'?bubble+av:av+bubble;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function showTyping(){
+  const div=document.createElement('div');div.className='msg';div.id='typing';
+  div.innerHTML=`<div class="avatar bot">🛍️</div><div class="bubble bot"><div class="dot-row"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+async function sendMsg(){
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';sendBtn.disabled=true;
+  addMsg('user',text);showTyping();
+  try{
+    const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+    const data=await res.json();
+    hideTyping();
+    addMsg('bot',data.answer||"Oops, couldn't find that!",data.evidence);
+  }catch(e){hideTyping();addMsg('bot','Connection error. Please try again!');}
+  sendBtn.disabled=false;inp.focus();
+}
+
+function quickSend(text){inp.value=text;sendMsg();}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}});
+inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,120)+'px';});
+</script>
+
+<!-- ── FLOATING CLUSTER ── -->
+<div id="fac">
+  <button class="fac-sat" id="fac-clear" data-tip="Clear" onclick="clearChat()">🗑️</button>
+  <button class="fac-sat" id="fac-rand" data-tip="Surprise me!" onclick="randomQ()">🎲</button>
+  <button class="fac-sat" id="fac-copy" data-tip="Share" onclick="copyLink()">🔗</button>
+  <button id="fac-main" onclick="toggleFac()">✦</button>
+</div>
+<div id="toast"></div>
+
+<style>
+#fac{position:fixed;bottom:28px;right:28px;z-index:400;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+#fac-main{
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--acc),var(--acc3));
+  border:none;cursor:pointer;color:#fff;font-size:22px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 24px rgba(255,0,110,.4);
+  transition:transform .25s,box-shadow .25s;position:relative;z-index:2;
+  animation:retpulse 3s ease-in-out infinite;
+}
+@keyframes retpulse{0%,100%{box-shadow:0 4px 24px rgba(255,0,110,.4)}50%{box-shadow:0 6px 32px rgba(255,0,110,.65),0 0 0 8px rgba(255,0,110,.08)}}
+#fac-main:hover{transform:scale(1.12);animation:none}
+#fac.open #fac-main{transform:rotate(180deg);animation:none}
+.fac-sat{
+  position:absolute;width:42px;height:42px;border-radius:50%;
+  border:none;cursor:pointer;color:#fff;font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translate(0,0) scale(0.3);
+  transition:opacity .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;z-index:1;background:var(--surface2);
+  border:1px solid var(--border);
+}
+#fac.open .fac-sat{opacity:1;pointer-events:all}
+#fac.open #fac-clear{transform:translate(0,-68px) scale(1);transition-delay:0s;border-color:rgba(255,82,82,.4)}
+#fac.open #fac-rand{transform:translate(-58px,-40px) scale(1);transition-delay:.07s;border-color:rgba(131,56,236,.4)}
+#fac.open #fac-copy{transform:translate(-66px,16px) scale(1);transition-delay:.14s;border-color:rgba(255,190,11,.3)}
+.fac-sat:hover{transform:scale(1.15) !important;filter:brightness(1.3)}
+.fac-sat::before{
+  content:attr(data-tip);position:absolute;right:50px;
+  background:rgba(17,0,22,.95);color:var(--txt);border:1px solid var(--border);
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
+  font-family:'Nunito',sans-serif;
+}
+.fac-sat:hover::before{opacity:1}
+#toast{
+  position:fixed;bottom:90px;right:28px;z-index:500;
+  background:var(--surface);color:var(--acc);border:1px solid rgba(255,0,110,.3);
+  padding:8px 18px;border-radius:20px;font-size:12px;font-weight:800;
+  font-family:'Nunito',sans-serif;
+  opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+
+<script>
+const fac=document.getElementById('fac');
+const toast=document.getElementById('toast');
+function toggleFac(){fac.classList.toggle('open')}
+document.addEventListener('click',e=>{if(!fac.contains(e.target))fac.classList.remove('open');});
+
+const RANDOM_QS=[
+  "What makes Prashanna stand out from other engineers?",
+  "What cool projects has he built?",
+  "Does he have any AI superpowers?",
+  "What's his tech stack?",
+  "Tell me something impressive about him!",
+  "What languages and frameworks does he use?",
+  "Has he done any open source work?",
+  "What's his machine learning experience like?",
+];
+
+function randomQ(){fac.classList.remove('open');inp.value=RANDOM_QS[Math.floor(Math.random()*RANDOM_QS.length)];sendMsg();}
+function clearChat(){fac.classList.remove('open');[...msgs.children].slice(1).forEach(k=>k.remove());showToast('✨ Chat cleared!')}
+function copyLink(){fac.classList.remove('open');navigator.clipboard.writeText(window.location.href).then(()=>showToast('🔗 Link copied!')).catch(()=>showToast('Failed!'))}
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000)}
+</script>
+</body>
+</html>
